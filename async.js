@@ -26,7 +26,11 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
     });
 
     function runJob(job, index, resolve) {
-        getPromise(job).then(answer => helper(answer, index, resolve));
+
+        return new Promise (currentResolve => {
+            job().then(currentResolve, currentResolve);
+            setTimeout(() => currentResolve(new Error('Promise timeout')), timeout);
+        }).then(answer => helper(answer, index, resolve));
     }
 
     function helper(answer, index, resolve) {
@@ -42,10 +46,5 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
         }
     }
 
-    function getPromise(job) {
-        return new Promise(resolve => {
-            job().then(resolve, resolve);
-            setTimeout(() => resolve(new Error('Promise timeout')), timeout);
-        });
-    }
+
 }
