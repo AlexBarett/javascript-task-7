@@ -10,41 +10,31 @@ exports.runParallel = runParallel;
  * @returns {Promise}
  */
 function runParallel(jobs, parallelNum, timeout = 1000) {
-    let nextThread = 1;
+    let nextJob = parallelNum;
     let finishedJob = 0;
     let result = [];
-    let parallelThreads = jobs.reduce(function (acc, element) {
-        if (acc[acc.length - 1].length < parallelNum) {
-            acc[acc.length - 1] = (acc[acc.length - 1].concat(element));
-
-            return acc;
-        }
-        acc.push([element]);
-
-        return acc;
-    }, [[]]);
+    let firsts = jobs.slice(0, parallelNum);
 
     return new Promise(resolve => {
-        parallelThreads.forEach((job, indexThread) => {
+        firsts.forEach((job, indexThread) => {
             runJob(job, indexThread, resolve);
         });
     });
 
-    function runJob(thread, indexThread, resolve) {
-        thread.forEach((job, indexJob) => getPromise(job, timeout).then(data =>
-            helper(data, indexThread * parallelNum + indexJob, resolve)));
+    function runJob(job, index, resolve) {
+        getPromise(job, timeout).then(answer => helper(answer, index, resolve));
     }
 
-    function helper(data, index, resolve) {
-        result[index] = data;
+    function helper(answer, index, resolve) {
+        result[index] = answer;
         finishedJob++;
         if (finishedJob === jobs.length) {
             resolve(result);
         }
-        if (nextThread < parallelThreads.length) {
-            let currentThread = nextThread;
-            nextThread++;
-            runJob(parallelThreads[currentThread], currentThread, resolve);
+        if (nextJob < jobs.length) {
+            let currentJob = nextJob;
+            nextJob++;
+            runJob(jobs[currentJob], currentJob, resolve);
         }
     }
 
