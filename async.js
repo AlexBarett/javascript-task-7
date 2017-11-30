@@ -16,13 +16,17 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
     let firsts = jobs.slice(0, parallelNum);
 
     return new Promise(resolve => {
-        firsts.forEach((job, indexThread) => {
-            runJob(job, indexThread, resolve);
-        });
+        if (jobs.length === 0) {
+            resolve([]);
+        } else {
+            firsts.forEach((job, index) => {
+                runJob(job, index, resolve);
+            });
+        }
     });
 
     function runJob(job, index, resolve) {
-        getPromise(job, timeout).then(answer => helper(answer, index, resolve));
+        getPromise(job).then(answer => helper(answer, index, resolve));
     }
 
     function helper(answer, index, resolve) {
