@@ -1,6 +1,6 @@
 'use strict';
 
-exports.isStar = true;
+exports.isStar = false;
 exports.runParallel = runParallel;
 // призыв проверки
 /** Функция паралелльно запускает указанное число промисов
