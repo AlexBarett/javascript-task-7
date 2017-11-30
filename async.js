@@ -2,7 +2,7 @@
 
 exports.isStar = true;
 exports.runParallel = runParallel;
-
+// призыв проверки
 /** Функция паралелльно запускает указанное число промисов
  * @param {Array} jobs – функции, которые возвращают промисы
  * @param {Number} parallelNum - число одновременно исполняющихся промисов
