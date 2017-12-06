@@ -13,27 +13,26 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
     let nextJob = parallelNum;
     let finishedJob = 0;
     let result = [];
-    let firsts = jobs.slice(0, parallelNum);
+    let firstSeries = jobs.slice(0, parallelNum);
 
     return new Promise(resolve => {
         if (jobs.length === 0) {
             resolve([]);
         } else {
-            firsts.forEach((job, index) => {
+            firstSeries.forEach((job, index) => {
                 runJob(job, index, resolve);
             });
         }
     });
 
     function runJob(job, index, resolve) {
-
-        return new Promise (currentResolve => {
+        return new Promise(currentResolve => {
             job().then(currentResolve, currentResolve);
             setTimeout(() => currentResolve(new Error('Promise timeout')), timeout);
-        }).then(answer => helper(answer, index, resolve));
+        }).then(answer => saveAndContinue(answer, index, resolve));
     }
 
-    function helper(answer, index, resolve) {
+    function saveAndContinue(answer, index, resolve) {
         result[index] = answer;
         finishedJob++;
         if (finishedJob === jobs.length) {
@@ -45,6 +44,4 @@ function runParallel(jobs, parallelNum, timeout = 1000) {
             runJob(jobs[currentJob], currentJob, resolve);
         }
     }
-
-
 }
